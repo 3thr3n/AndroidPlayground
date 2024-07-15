@@ -24,13 +24,13 @@ class TodosManagerTest {
 
     @Test
     fun shouldSaveASingleDataWhichCanBeReadAgain() {
-        // gi
+        // given
         val todo = ToDo("Title", "Deswc", LocalDate.now(), false);
 
-        // Act
+        // when
         todosManager.saveSingleData(todo)
 
-        // Assert
+        // then
         val savedData = todosManager.getData()
 
         assertEquals(1, savedData.size)
@@ -39,19 +39,35 @@ class TodosManagerTest {
 
     @Test
     fun shouldAddASingleDataWhichCanBeReadAgain() {
-        // Arrange
+        // given
         val todo = ToDo("Title", "Deswc", LocalDate.now(), false);
         todosManager.saveSingleData(todo)
 
         val toAddTodo = ToDo("Second", "Second description", LocalDate.now(), true);
-        // Act
+
+        // when
         todosManager.saveSingleData(toAddTodo)
 
-        // Assert
+        // then
         val savedData = todosManager.getData()
 
         assertEquals(2, savedData.size)
         assertEquals(todo, savedData[0])
         assertEquals(toAddTodo, savedData[1])
+    }
+
+    @Test
+    fun shouldDeleteWithId() {
+        // given
+        val todo = ToDo("Title", "Deswc", LocalDate.now(), false);
+        todosManager.saveSingleData(todo)
+
+        // when
+        todosManager.deleteOne(todo.id)
+
+        // then
+        val savedData = todosManager.getData()
+
+        assertEquals(0, savedData.size)
     }
 }
