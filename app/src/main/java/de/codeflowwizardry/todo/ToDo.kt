@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator
 import java.time.LocalDate
 
 class ToDo {
-    var id: String
+    val id: String
     var title by mutableStateOf("")
     var description by mutableStateOf("")
     var dueDate by mutableStateOf(LocalDate.now())

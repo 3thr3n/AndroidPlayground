@@ -13,9 +13,9 @@ class TodosManager(context: Context) {
     private val mapper = ObjectMapper().registerKotlinModule().registerModules(JavaTimeModule())
 
     private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("ToDos", Context.MODE_PRIVATE)
+        context.getSharedPreferences("ToDos", Context.MODE_PRIVATE);
 
-    private var map: HashMap<String, ToDo>? = null
+    private var map: HashMap<String, ToDo>
 
     private fun saveAllData() {
         val editor = sharedPreferences.edit()
@@ -23,21 +23,37 @@ class TodosManager(context: Context) {
         editor.apply()
     }
 
-    fun saveSingleData(value: ToDo) {
-        map?.set(value.id, value)
+    fun addToDo(value: ToDo) {
+        map[value.id] = value
         saveAllData()
     }
 
-    fun getData(): List<ToDo> {
-        if (map == null) {
-            val todosString: String = sharedPreferences.getString(key, "{}").toString();
-            map = mapper.readValue<HashMap<String, ToDo>>(todosString)
+    fun getTodos(): List<ToDo> {
+        return map.values.toList()
+    }
+
+    fun deleteToDo(id: String) {
+        if (!map.containsKey(id)) {
+            throw IllegalArgumentException("Can't find todo!")
         }
-        return map!!.values.toList()
+        map.remove(id)
+        saveAllData()
     }
 
-    fun deleteOne(id: String) {
-        map!!.remove(id)
+    fun clean() {
+        map.clear();
         saveAllData()
+    }
+
+    fun finishToDo(id: String) {
+        val get = map[id] ?: throw IllegalArgumentException("Can't find todo!")
+        get.done = true;
+        map[id] = get
+        saveAllData();
+    }
+
+    init {
+        val todosString: String = sharedPreferences.getString(key, "{}").toString()
+        map = mapper.readValue<HashMap<String, ToDo>>(todosString)
     }
 }

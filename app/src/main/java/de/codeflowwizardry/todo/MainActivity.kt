@@ -17,10 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -68,7 +66,7 @@ fun Base(modifier: Modifier = Modifier) {
 
     val todosManager = remember { TodosManager(context) }
     var onlyUnfinished by remember { mutableStateOf(false) }
-    var todos by remember { mutableStateOf(todosManager.getData()) }
+    var todos by remember { mutableStateOf(todosManager.getTodos()) }
 
     Column(
         modifier = modifier
@@ -78,20 +76,20 @@ fun Base(modifier: Modifier = Modifier) {
         Header(
             onNameChange = { name ->
                 run {
-                    todosManager.saveSingleData(name)
-                    todos = todosManager.getData()
+                    todosManager.addToDo(name)
+                    todos = todosManager.getTodos()
                 }
             },
             onlyUnfinished,
             onToggleUnfinished = { onlyUnfinished = !onlyUnfinished })
         Todos(todos, onlyUnfinished, update = {
             run {
-                todosManager.saveSingleData(it)
+                todosManager.finishToDo(it)
             }
         }, delete = {
             run {
-                todosManager.deleteOne(it)
-                todos = todosManager.getData()
+                todosManager.deleteToDo(it)
+                todos = todosManager.getTodos()
             }
         })
     }
@@ -101,7 +99,7 @@ fun Base(modifier: Modifier = Modifier) {
 fun Todos(
     todos: List<ToDo>,
     onlyUnfinished: Boolean,
-    update: (todo: ToDo) -> Unit,
+    update: (id: String) -> Unit,
     delete: (id: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -120,9 +118,9 @@ fun Todos(
                 Checkbox(checked = todo.done, onCheckedChange = {
                     run {
                         todo.done = !todo.done
-                        update(todo)
+                        update(todo.id)
                     }
-                })
+                }, enabled = !todo.done)
 
                 Column(
                     modifier = Modifier
